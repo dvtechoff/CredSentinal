@@ -1,0 +1,37 @@
+services:
+  # Backend API
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=sqlite:///./credit_monitor.db
+      - DEBUG=True
+      - LOG_LEVEL=DEBUG
+    volumes:
+      - ./backend:/app
+      - ./data:/app/data
+    restart: unless-stopped
+    networks:
+      - credit-monitor-network
+
+  # Frontend Dashboard
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "8501:8501"
+    environment:
+      - API_BASE_URL=http://localhost:8000
+    volumes:
+      - ./frontend:/app
+    restart: unless-stopped
+    networks:
+      - credit-monitor-network
+
+networks:
+  credit-monitor-network:
+    driver: bridge
